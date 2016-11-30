@@ -33,6 +33,14 @@ import javax.swing.JPanel
 
 class ToStringDeluxeAction : AnAction() {
 
+    override fun update(e: AnActionEvent?) {
+        if (e != null) {
+            val activeCodeElement = e.getData(PSI_FILE)!!.findElementAt(e.getData(EDITOR)!!.caretModel.offset)
+            val targetClass = PsiTreeUtil.getParentOfType(activeCodeElement, PsiClass::class.java)
+            e.presentation.isEnabled = targetClass != null
+        }
+    }
+
     override fun actionPerformed(e: AnActionEvent) {
         val targetClass = getTargetClass(e)
 
