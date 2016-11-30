@@ -5,13 +5,13 @@
     <vendor email="gmwitkowski@gmail.com"/>
 
     <description><![CDATA[
-      Enter short description for your plugin here.<br>
-      <em>most HTML tags may be used</em>
+toString Deluxe is a plugin for IntelliJ IDEA that allows to quickly generate toString method using Guava's MoreObjects.ToStringHelper
+ utility. Now you can just hit ALT+INSERT, choose toString with Guava, choose fields you want to include and enjoy your
+ simple and clean toString method :)
     ]]></description>
 
     <change-notes><![CDATA[
-      Add change notes here.<br>
-      <em>most HTML tags may be used</em>
+
     ]]>
     </change-notes>
 
@@ -30,8 +30,8 @@
 
     <actions>
         <!-- Add your actions here -->
-        <action id="tostring-deluxe-action" class="tostringdeluxe.ToStringDeluxeAction" text="toString method">
-            <add-to-group group-id="GenerateGroup" anchor="last"/>
+        <action id="tostring-deluxe-action" class="tostringdeluxe.ToStringDeluxeAction" text="toString() with Guava">
+            <add-to-group group-id="JavaGenerateGroup1" anchor="last"/>
         </action>
     </actions>
 

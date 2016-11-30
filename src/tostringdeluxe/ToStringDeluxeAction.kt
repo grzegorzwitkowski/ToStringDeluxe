@@ -48,7 +48,7 @@ class ToStringDeluxeAction : AnAction() {
                 }.execute()
             }
         } else {
-            val notificationGroup = NotificationGroup("tostring-deluxe-notification-group", BALLOON, false)
+            val notificationGroup = NotificationGroup("toString Deluxe", BALLOON, false)
             val notification = notificationGroup.createNotification("Guava 18.0+ wasn't found on classpath.", ERROR)
             Notifications.Bus.notify(notification, e.project)
         }
