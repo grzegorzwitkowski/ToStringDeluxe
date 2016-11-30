@@ -35,21 +35,20 @@ class ToStringDeluxeAction : AnAction() {
 
     override fun update(e: AnActionEvent?) {
         if (e != null) {
-            val activeCodeElement = e.getData(PSI_FILE)!!.findElementAt(e.getData(EDITOR)!!.caretModel.offset)
-            val targetClass = PsiTreeUtil.getParentOfType(activeCodeElement, PsiClass::class.java)
-            e.presentation.isEnabled = targetClass != null
+            e.presentation.isEnabled = getTargetClass(e) != null
         }
     }
 
     override fun actionPerformed(e: AnActionEvent) {
-        val targetClass = getTargetClass(e)
+        val project = e.project ?: return
+        val targetClass = getTargetClass(e) ?: return
 
-        if (guavaIsOnModuleClasspath(targetClass, e.project!!)) {
+        if (guavaIsOnModuleClasspath(targetClass, project)) {
             val fieldSelectionDialog = FieldSelectionDialog(targetClass)
             fieldSelectionDialog.show()
             if (fieldSelectionDialog.isOK) {
-                val generatedCode = generateCode(e.project!!, targetClass, fieldSelectionDialog.selectedFields())
-                object : WriteCommandAction.Simple<Project>(e.project, e.getData(PSI_FILE)!!) {
+                val generatedCode = generateCode(project, targetClass, fieldSelectionDialog.selectedFields())
+                object : WriteCommandAction.Simple<Project>(project, e.getData(PSI_FILE)!!) {
                     override fun run() {
                         targetClass.add(generatedCode)
                     }
@@ -58,19 +57,19 @@ class ToStringDeluxeAction : AnAction() {
         } else {
             val notificationGroup = NotificationGroup("toString Deluxe", BALLOON, false)
             val notification = notificationGroup.createNotification("Guava 18.0+ wasn't found on classpath.", ERROR)
-            Notifications.Bus.notify(notification, e.project)
+            Notifications.Bus.notify(notification, project)
         }
     }
 
     private fun guavaIsOnModuleClasspath(targetClass: PsiClass, project: Project): Boolean {
-        val module = ModuleUtil.findModuleForFile(targetClass.containingFile.virtualFile, project)!!
+        val module = ModuleUtil.findModuleForFile(targetClass.containingFile.virtualFile, project) ?: return false
         val scope = GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(module, false)
         return JavaPsiFacade.getInstance(project).findClass("com.google.common.base.MoreObjects", scope) != null
     }
 
-    private fun getTargetClass(e: AnActionEvent): PsiClass {
+    private fun getTargetClass(e: AnActionEvent): PsiClass? {
         val activeCodeElement = e.getData(PSI_FILE)!!.findElementAt(e.getData(EDITOR)!!.caretModel.offset)
-        return PsiTreeUtil.getParentOfType(activeCodeElement, PsiClass::class.java)!!
+        return PsiTreeUtil.getParentOfType(activeCodeElement, PsiClass::class.java)
     }
 
     private fun generateCode(project: Project, targetClass: PsiClass, selectedFields: List<PsiField>): PsiElement {
